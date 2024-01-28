@@ -1,0 +1,161 @@
+var signupName = document.getElementById("signupName");
+var signupEmail = document.getElementById("signupEmail");
+var signupPassword = document.getElementById("signupPassword");
+var signinEmail = document.getElementById('signinEmail')
+var signinPassword = document.getElementById('signinPassword');
+var invalidMessage = document.getElementById('invalidMessage');
+var currentUser = document.getElementById('currentUser');
+
+
+
+
+
+var nameRegex = /^\w{3,}(\s+\w+)*$/;
+var emailRegex = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
+
+console.log("zahaaaaa  "+localStorage.getItem('currentUser'));
+
+var users = []
+if (localStorage.getItem('users') == null) {
+  users = []
+  console.log("TEST " + users[0].name);
+} else {
+  users = JSON.parse(localStorage.getItem('users'))
+  console.log("TEST"+users[1].email+""+users[1].password);
+}
+
+function isEmpty(name, email,  password) {
+
+ if (name!=null){
+  if (name.value == "" || email.value == "" || password.value == "") {
+    return false
+  } else {
+    return true
+  }
+ } else{
+  if ( email.value == "" || password.value == "") {
+    return false
+  } else {
+    return true
+  }
+ }
+  
+ 
+}
+
+function vaildation() {
+  if (!emailRegex.test(signupEmail.value)) {
+    var emailInput = document.getElementById("signupEmail");
+    emailInput.classList.add("is-invalid");
+    var invalidMessage = document.getElementById("invalidMessage");
+    invalidMessage.classList.remove("d-none");
+    return false;
+  }
+}
+
+// Signup
+function signUp() {
+  var newUser = {
+    name: signupName.value,
+    email: signupEmail.value,
+    password: signupPassword.value,
+  };
+  if (isEmpty(signupName, signupEmail, signupPassword) == false) {
+    invalidMessage.innerHTML = '<span class="text-danger m-3">All inputs are required</span>'
+    invalidMessage.classList.remove("d-none");
+    return false
+  }
+  if (vaildation() == false) {
+    return;
+  }
+  else {
+    users.push(newUser);
+    localStorage.setItem("users", JSON.stringify(users));
+    localStorage.setItem("name", signupName);
+    localStorage.setItem("usemailerEmail", signupEmail);
+    localStorage.setItem("password", signupPassword);
+    invalidMessage.innerHTML = '<span class="text-success m-3">Success</span>'
+    invalidMessage.classList.remove("d-none");
+    localStorage.setItem('currentUser', users.name);
+    window.location.href = "home.html";
+
+  }
+
+}
+
+
+// Login
+
+// to check email is registered
+function isEmailExist() {
+  for (var i = 0; i < users.length; i++) {
+      if (users[i].email.toLowerCase() == signinEmail.value.toLowerCase()) {
+          return false
+      }
+  }
+}
+
+function login() {
+  console.log(signinPassword.value);
+  var errorMessage = document.getElementById("invalid_login");
+  if (isEmpty(null ,signinEmail, signinPassword) == false) {
+    errorMessage.innerHTML = '<span class="text-danger m-3">All inputs are required</span>'
+    invalidMessage.classList.remove("d-none");
+    console.log("zaaa");
+    return false
+  }
+var userFound=false;
+for(var i =0; i< users.length; i++){
+  if (users[i].email.toLowerCase() == signinEmail.value.toLowerCase() && users[i].password.toLowerCase() == signinPassword.value.toLowerCase()){
+    localStorage.setItem('currentUser', users[i].name)
+    currentUser =users[i].name;
+    userFound=true;
+    errorMessage.classList.add("d-none");
+    window.location.href = "home.html";
+    break;
+  }
+  
+}
+if(!userFound) {
+  console.log("ajhsjzazzazaaza");
+  errorMessage.innerHTML = '<span class="p-2 text-danger">Incorrect email or password</span>'
+  errorMessage.classList.remove("d-none");
+}
+
+
+  // var user = users.find(
+  //   (user) => user.email === signinEmail.value && user.password === signinPassword.value
+  // );
+    // console.log("ajhjahd "+user);
+  // if (user) {
+  //   localStorage.setItem("currentUser", user.name);
+  //   // window.location.href = "home.html";
+  // } else {
+  //   console.log("ajhsjzazzazaaza");
+  //   errorMessage.innerHTML = '<span class="p-2 text-danger">Incorrect email or password</span>'
+  //   errorMessage.classList.remove("d-none");
+  // }
+}
+
+
+// for logout
+function logout() {
+  localStorage.removeItem('currentUser')
+}
+
+
+// disply home page
+
+function displayUserName() {
+  var loggedInUserName = localStorage.getItem('currentUser');
+  if (loggedInUserName) {
+    var welcomeMessage = "Welcome " +  loggedInUserName.charAt(0).toUpperCase() + loggedInUserName.slice(1);
+   
+    
+    currentUser.textContent = welcomeMessage;
+  }
+}
+
+window.onload = function () {
+  displayUserName();
+};
